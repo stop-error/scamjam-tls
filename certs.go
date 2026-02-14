@@ -42,6 +42,7 @@ import (
 	"fmt"
 
 	"github.com/rs/zerolog"
+
 )
 
 // KeyPairWithPin returns PEM encoded Certificate and Key along with an SKPI
@@ -70,6 +71,12 @@ func GetRootCa(logger *zerolog.Logger, certOrgName string) (caCertAsPem []byte, 
 	}
 
 
+	caPrivateKeyPEM := new(bytes.Buffer)
+	pem.Encode(caPrivateKeyPEM, &pem.Block{
+		Type:  "RSA PRIVATE KEY",
+		Bytes: x509.MarshalPKCS1PrivateKey(caPrivateKey),
+	})
+
 	caBytes, err := x509.CreateCertificate(rand.Reader, &caTemplate, &caTemplate, &caPrivateKey.PublicKey, caPrivateKey)
 	if err != nil {
 		logger.Error().Msg("Error creating CA x.509!" + err.Error())
@@ -83,19 +90,13 @@ func GetRootCa(logger *zerolog.Logger, certOrgName string) (caCertAsPem []byte, 
 		Bytes: caBytes,
 	})
 
-	caPrivateKeyPEM := new(bytes.Buffer)
-	pem.Encode(caPrivateKeyPEM, &pem.Block{
-		Type:  "RSA PRIVATE KEY",
-		Bytes: x509.MarshalPKCS1PrivateKey(caPrivateKey),
-	})
-
 	return caPEM.Bytes(), caPrivateKeyPEM.Bytes(), nil
 }
 
 
-func GetLeaf(logger *zerolog.Logger, certOrgName string, caCertAsPem []byte, caPrivateKeyAsPem []byte,) (leafCertAsPem []byte, leafPrivateKeyAsPem []byte, err error) {
+func GetLeaf(logger *zerolog.Logger, certOrgName string, caCertAsBytes []byte, caPrivateKeyAsBytes []byte,) (leafCertAsPem []byte, leafPrivateKeyAsPem []byte, err error) {
 
-	caCertPEM, restOfCaCertPEM := pem.Decode(caCertAsPem)
+	caCertPEM, restOfCaCertPEM := pem.Decode(caCertAsBytes)
 	switch {
 	case caCertPEM == nil:
 		err = fmt.Errorf("Failed to decode root CA cert from bytes! (PEM was empty)")
@@ -110,7 +111,7 @@ func GetLeaf(logger *zerolog.Logger, certOrgName string, caCertAsPem []byte, caP
 	}
 
 
-	caPrivateKeyPEM, restOfCAPrivateKeyPEM := pem.Decode(caPrivateKeyAsPem)
+	caPrivateKeyPEM, restOfCAPrivateKeyPEM := pem.Decode(caPrivateKeyAsBytes)
 	switch {
 	case caPrivateKeyPEM == nil:
 		err = fmt.Errorf("Failed to decode root CA private key from bytes! (PEM was empty)")
