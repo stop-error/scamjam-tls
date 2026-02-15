@@ -146,7 +146,7 @@ func GetLeaf(logger *zerolog.Logger, certOrgName string, caCertAsBytes []byte, c
 		Organization:  []string{certOrgName},
 		Country:       []string{"US"},
 	},
-	IPAddresses:  []net.IP{net.IPv4(127, 0, 0, 3), net.IPv6loopback},
+	IPAddresses:  []net.IP{net.IPv4(127, 0, 0, 1), net.IPv6loopback},
 	NotBefore:    time.Now(),
 	NotAfter:     time.Now().AddDate(10, 0, 0),
 	SubjectKeyId: []byte{1, 2, 3, 4, 6},
