@@ -150,5 +150,5 @@ func GetLeaf(logger *zerolog.Logger, certOrgName string, caCertAsBytes []byte, c
 		Bytes: x509.MarshalPKCS1PrivateKey(leafCertPrivateKey),
 	})
 
-	return leafCertAsPem, leafPrivateKeyAsPem, nil
+	return leafCertPEM.Bytes(), leafCertPrivateKeyPEM.Bytes(), nil
 }
