@@ -24,7 +24,7 @@ func GetRootCa(logger *zerolog.Logger, certOrgName string) (caCertAsPem []byte, 
 	caTemplate := x509.Certificate{
 		SerialNumber:          big.NewInt(100),
 		Subject:               pkix.Name{
-			//CommonName:    "127.0.0.3", 
+			CommonName:    "localhost", 
 			Organization:  []string{certOrgName},
 			Country:       []string{"US"}},
 		NotBefore:             time.Now(),
@@ -114,7 +114,7 @@ func GetLeaf(logger *zerolog.Logger, certOrgName string, caCertAsBytes []byte, c
 	leafCertDetails := &x509.Certificate{
 	SerialNumber: big.NewInt(200),
 	Subject: pkix.Name{
-		//CommonName:    "127.0.0.3",
+		CommonName:    "localhost",
 		Organization:  []string{certOrgName},
 		Country:       []string{"US"},
 	},
